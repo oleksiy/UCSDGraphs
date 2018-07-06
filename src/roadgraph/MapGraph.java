@@ -8,12 +8,11 @@
 package roadgraph;
 
 
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import geography.GeographicPoint;
 import util.GraphLoader;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -24,7 +23,8 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
-	
+	private Map<Node, ArrayList<Node>> adjacencyListMap;
+	public int numVertices;
 	
 	/** 
 	 * Create a new empty MapGraph 
@@ -32,6 +32,8 @@ public class MapGraph {
 	public MapGraph()
 	{
 		// TODO: Implement in this constructor in WEEK 3
+		adjacencyListMap = new HashMap<>();
+		numVertices = adjacencyListMap.size();
 	}
 	
 	/**
@@ -41,7 +43,7 @@ public class MapGraph {
 	public int getNumVertices()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		return numVertices;
 	}
 	
 	/**
@@ -51,7 +53,11 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices()
 	{
 		//TODO: Implement this method in WEEK 3
-		return null;
+		Set<GeographicPoint> vertices = new HashSet<>();
+		for (Node n : adjacencyListMap.keySet()) {
+			vertices.add(n.location);
+		}
+		return vertices;
 	}
 	
 	/**
@@ -206,6 +212,7 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
+		System.out.println(firstMap.getNumVertices());
 		
 		// You can use this method for testing.  
 		
