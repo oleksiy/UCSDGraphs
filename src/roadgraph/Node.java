@@ -26,7 +26,7 @@ public class Node {
 
     @Override
     public String toString(){
-        return "Node: " + " (" + location.getX() + "," + location.getY() + ")";
+        return "Node:" + " (" + location.getX() + "," + location.getY() + ")";
     }
 
     /**

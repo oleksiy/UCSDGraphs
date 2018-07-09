@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
-	private Map<Node, ArrayList<Node>> adjacencyListMap;
+	private Map<Node, ArrayList<Edge>> adjacencyListMap;
 	public int numVertices;
 	
 	/** 
@@ -67,7 +67,15 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 3
-		return 0;
+		int sumOfEdges = 0;
+
+		for (Node x : this.adjacencyListMap.keySet()) {
+			if (this.adjacencyListMap.get(x) != null) {
+				sumOfEdges += this.adjacencyListMap.get(x).size();
+			}
+		}
+
+		return sumOfEdges;
 	}
 
 	
@@ -82,7 +90,12 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 3
-		return false;
+		if (location == null || adjacencyListMap.containsKey(new Node(location))) {
+			return false;
+		}
+		this.numVertices ++;
+		adjacencyListMap.put(new Node(location), null);
+		return true;
 	}
 	
 	/**
@@ -99,9 +112,16 @@ public class MapGraph {
 	 */
 	public void addEdge(GeographicPoint from, GeographicPoint to, String roadName,
 			String roadType, double length) throws IllegalArgumentException {
-
 		//TODO: Implement this method in WEEK 3
-		
+		Node nodeInList = new Node(from);
+		Edge e = new Edge(new Node(from), new Node(to), roadName, roadType, length);
+		if (this.adjacencyListMap.get(nodeInList) == null) {
+			ArrayList<Edge> newList = new ArrayList<>();
+			newList.add(e);
+			this.adjacencyListMap.put(nodeInList, newList);
+		} else {
+			this.adjacencyListMap.get(nodeInList).add(e);
+		}
 	}
 	
 
@@ -203,6 +223,21 @@ public class MapGraph {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("MapGraph has " + this.getNumVertices() + " vertices, " + this.getNumEdges() + " edges.\n");
+		for (Node x : this.adjacencyListMap.keySet()) {
+			if (this.adjacencyListMap.get(x) != null) {
+				sb.append(x.toString() + " ");
+				for (Edge e : this.adjacencyListMap.get(x)) {
+					sb.append("\t" + e.toString() + "\n");
+				}
+			}
+		}
+		return sb.toString();
+	}
+
 	
 	
 	public static void main(String[] args)
@@ -212,11 +247,11 @@ public class MapGraph {
 		System.out.print("DONE. \nLoading the map...");
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", firstMap);
 		System.out.println("DONE.");
-		System.out.println(firstMap.getNumVertices());
+		System.out.println(firstMap.toString());
+
 		
 		// You can use this method for testing.  
-		
-		
+
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 
 		 * programming assignment.
