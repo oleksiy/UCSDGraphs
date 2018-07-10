@@ -55,7 +55,7 @@ public class MapGraph {
 		//TODO: Implement this method in WEEK 3
 		Set<GeographicPoint> vertices = new HashSet<>();
 		for (Node n : adjacencyListMap.keySet()) {
-			vertices.add(n.location);
+			vertices.add(n.getLocation());
 		}
 		return vertices;
 	}
@@ -135,6 +135,36 @@ public class MapGraph {
 	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal) {
 		// Dummy variable for calling the search algorithms
         Consumer<GeographicPoint> temp = (x) -> {};
+		List<GeographicPoint> path = new ArrayList<>();
+        Queue<Node> queueToExplore = new LinkedList<>();
+        HashSet<Node> visited = new HashSet<>();
+        //parent map
+		Map<Node, List<Node>> parentMap = new HashMap<>();
+        queueToExplore.add(new Node(start));
+        visited.add(new Node(start));
+        while(!queueToExplore.isEmpty()) {
+        	Node current = queueToExplore.remove();
+			if (current.equals(goal)) {
+				return path;
+			} else {
+				for (Edge e : adjacencyListMap.get(current)) {
+					if (!e.getDesitinationNode().isVisited()) {
+						e.getDesitinationNode().setVisited(true);
+						if (parentMap.get(current) != null) {
+							List<Node> children = parentMap.get(current);
+							children.add(e.getDesitinationNode());
+						} else {
+							List<Node> children = new ArrayList<>();
+							children.add(e.getDesitinationNode());
+							parentMap.put(current, children);
+						}
+					} else {
+						e.getDesitinationNode().setVisited(true);
+					}
+				}
+			}
+		}
+
         return bfs(start, goal, temp);
 	}
 	
@@ -150,11 +180,12 @@ public class MapGraph {
 			 					     GeographicPoint goal, Consumer<GeographicPoint> nodeSearched)
 	{
 		// TODO: Implement this method in WEEK 3
-		
+		List<GeographicPoint> path = new ArrayList<>();
+
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
-		return null;
+		return path;
 	}
 	
 
@@ -249,8 +280,15 @@ public class MapGraph {
 		System.out.println("DONE.");
 		System.out.println(firstMap.toString());
 
-		
-		// You can use this method for testing.  
+		Queue<Node> q = new LinkedList<>();
+		Node a = new Node(2.5, 3.2);
+		Node b = new Node(-1.0, 5.2);
+		q.add(a);
+		q.add(b);
+		System.out.println("FIRST: " + q.remove());
+		System.out.println("SECOND: " + q.remove());
+		// You can use this method for testing.
+
 
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 

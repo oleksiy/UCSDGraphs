@@ -3,8 +3,8 @@ package roadgraph;
 import geography.GeographicPoint;
 
 public class Node {
-    public GeographicPoint location;
-    public boolean visited;
+    private GeographicPoint location;
+    private boolean visited;
 
     public Node() {
         this.location = null;
@@ -12,6 +12,12 @@ public class Node {
     }
 
     public Node(GeographicPoint location) {
+        this.location = location;
+        this.visited = false;
+    }
+
+    public Node(double lat, double lon) {
+        GeographicPoint location = new GeographicPoint(lat, lon);
         this.location = location;
         this.visited = false;
     }
@@ -24,9 +30,19 @@ public class Node {
         return this.visited;
     }
 
+    public void setVisited(boolean setting) { this.visited = setting; }
+
+    public boolean equals(Node b) {
+        if(this.location.equals(b.location)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     @Override
     public String toString(){
-        return "Node:" + " (" + location.getX() + "," + location.getY() + ")";
+        return "Node:" + " (" + location.getX() + "," + location.getY() + "). Was visited? " + this.visited + ".";
     }
 
     /**
