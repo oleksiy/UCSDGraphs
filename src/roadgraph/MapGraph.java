@@ -23,7 +23,8 @@ import java.util.function.Consumer;
  */
 public class MapGraph {
 	//TODO: Add your member variables here in WEEK 3
-	private Map<Node, ArrayList<Edge>> adjacencyListMap;
+	private HashMap<Node, HashSet<Node>> adjacencyListMap;
+	private List<Edge> listOfEdges;
 	public int numVertices;
 	
 	/** 
@@ -34,6 +35,7 @@ public class MapGraph {
 		// TODO: Implement in this constructor in WEEK 3
 		adjacencyListMap = new HashMap<>();
 		numVertices = adjacencyListMap.size();
+		listOfEdges = new ArrayList<>();
 	}
 	
 	/**
@@ -67,15 +69,7 @@ public class MapGraph {
 	public int getNumEdges()
 	{
 		//TODO: Implement this method in WEEK 3
-		int sumOfEdges = 0;
-
-		for (Node x : this.adjacencyListMap.keySet()) {
-			if (this.adjacencyListMap.get(x) != null) {
-				sumOfEdges += this.adjacencyListMap.get(x).size();
-			}
-		}
-
-		return sumOfEdges;
+		return this.listOfEdges.size();
 	}
 
 	
@@ -90,12 +84,17 @@ public class MapGraph {
 	public boolean addVertex(GeographicPoint location)
 	{
 		// TODO: Implement this method in WEEK 3
-		if (location == null || adjacencyListMap.containsKey(new Node(location))) {
+		if(location == null){
 			return false;
 		}
-		this.numVertices ++;
-		adjacencyListMap.put(new Node(location), null);
-		return true;
+		Node toAdd = new Node(location);
+		if (!this.adjacencyListMap.containsKey(toAdd)) {
+			this.adjacencyListMap.put(toAdd, new HashSet<>());
+			this.numVertices++;
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -113,17 +112,19 @@ public class MapGraph {
 	public void addEdge(GeographicPoint from, GeographicPoint to, String roadName,
 			String roadType, double length) throws IllegalArgumentException {
 		//TODO: Implement this method in WEEK 3
-		Node nodeInList = new Node(from);
-		Edge e = new Edge(new Node(from), new Node(to), roadName, roadType, length);
-		if (this.adjacencyListMap.get(nodeInList) == null) {
-			ArrayList<Edge> newList = new ArrayList<>();
-			newList.add(e);
-			this.adjacencyListMap.put(nodeInList, newList);
-		} else {
-			this.adjacencyListMap.get(nodeInList).add(e);
+		Node fromNode = new Node(from);
+		Node toNode = new Node(to);
+		Edge e = new Edge(fromNode, toNode, roadName, roadType, length);
+		if (this.adjacencyListMap.keySet().contains(fromNode)) {
+			this.adjacencyListMap.get(fromNode).add(toNode);
 		}
+
+		if (this.adjacencyListMap.keySet().contains(toNode)) {
+			this.adjacencyListMap.get(toNode).add(fromNode);
+		}
+
+		this.listOfEdges.add(e);
 	}
-	
 
 	/** Find the path from start to goal using breadth first search
 	 * 
@@ -135,36 +136,6 @@ public class MapGraph {
 	public List<GeographicPoint> bfs(GeographicPoint start, GeographicPoint goal) {
 		// Dummy variable for calling the search algorithms
         Consumer<GeographicPoint> temp = (x) -> {};
-		List<GeographicPoint> path = new ArrayList<>();
-        Queue<Node> queueToExplore = new LinkedList<>();
-        HashSet<Node> visited = new HashSet<>();
-        //parent map
-		Map<Node, List<Node>> parentMap = new HashMap<>();
-        queueToExplore.add(new Node(start));
-        visited.add(new Node(start));
-        while(!queueToExplore.isEmpty()) {
-        	Node current = queueToExplore.remove();
-			if (current.equals(goal)) {
-				return path;
-			} else {
-				for (Edge e : adjacencyListMap.get(current)) {
-					if (!e.getDesitinationNode().isVisited()) {
-						e.getDesitinationNode().setVisited(true);
-						if (parentMap.get(current) != null) {
-							List<Node> children = parentMap.get(current);
-							children.add(e.getDesitinationNode());
-						} else {
-							List<Node> children = new ArrayList<>();
-							children.add(e.getDesitinationNode());
-							parentMap.put(current, children);
-						}
-					} else {
-						e.getDesitinationNode().setVisited(true);
-					}
-				}
-			}
-		}
-
         return bfs(start, goal, temp);
 	}
 	
@@ -258,13 +229,9 @@ public class MapGraph {
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
 		sb.append("MapGraph has " + this.getNumVertices() + " vertices, " + this.getNumEdges() + " edges.\n");
-		for (Node x : this.adjacencyListMap.keySet()) {
-			if (this.adjacencyListMap.get(x) != null) {
-				sb.append(x.toString() + " ");
-				for (Edge e : this.adjacencyListMap.get(x)) {
-					sb.append("\t" + e.toString() + "\n");
-				}
-			}
+		sb.append("How many keys: " + this.adjacencyListMap.keySet().size() + "\n");
+		for(Node n : this.adjacencyListMap.keySet()) {
+			sb.append(n.toString() + " ==> " +this.adjacencyListMap.get(n).size() +"\n");
 		}
 		return sb.toString();
 	}
@@ -280,13 +247,14 @@ public class MapGraph {
 		System.out.println("DONE.");
 		System.out.println(firstMap.toString());
 
-		Queue<Node> q = new LinkedList<>();
-		Node a = new Node(2.5, 3.2);
-		Node b = new Node(-1.0, 5.2);
-		q.add(a);
-		q.add(b);
-		System.out.println("FIRST: " + q.remove());
-		System.out.println("SECOND: " + q.remove());
+		Set<Integer> set = new HashSet<>();
+		set.add(3);
+		set.add(4);
+		set.add(3);
+
+		System.out.println(set.toString());
+		//System.out.println("FIRST: " + q.remove());
+		//System.out.println("SECOND: " + q.remove());
 		// You can use this method for testing.
 
 
