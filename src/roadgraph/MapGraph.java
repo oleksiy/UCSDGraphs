@@ -152,6 +152,40 @@ public class MapGraph {
 	{
 		// TODO: Implement this method in WEEK 3
 		List<GeographicPoint> path = new ArrayList<>();
+		Node startNode = new Node(start);
+		Node goalNode = new Node(goal);
+		//initialize a queue
+		Queue<Node> queue = new LinkedList<>();
+		//initialize a parent hashmap
+		HashMap<Node, ArrayList<Node>> parentMap = new HashMap<>();
+		queue.add(startNode);
+		while(!queue.isEmpty()) {
+			Node curr = queue.remove();
+			nodeSearched.accept(curr.getLocation());
+			if(curr.equals(goalNode)) {
+
+				return path;
+			}
+			//for each neigbor of curr, mark them as visited and add them as children of curr
+			//afterwards, add them to the queue to keep this train a-rollin'
+			for (Node neighbor : adjacencyListMap.get(curr)) {
+				if(!neighbor.isVisited()) {
+					neighbor.setVisited(true);
+					if(parentMap.containsKey(curr)) {
+						ArrayList<Node> childList = parentMap.get(curr);
+						childList.add(neighbor);
+						parentMap.put(curr, childList);
+					} else {
+						ArrayList<Node> childList = new ArrayList<>();
+						childList.add(neighbor);
+						parentMap.put(curr, childList);
+					}
+				}
+				queue.add(neighbor);
+			}
+		}
+
+
 
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
@@ -253,6 +287,8 @@ public class MapGraph {
 		set.add(3);
 
 		System.out.println(set.toString());
+
+		Map<Node, ArrayList<Node>> myMap = new HashMap<>();
 		//System.out.println("FIRST: " + q.remove());
 		//System.out.println("SECOND: " + q.remove());
 		// You can use this method for testing.
