@@ -158,19 +158,25 @@ public class MapGraph {
 		Queue<Node> queue = new LinkedList<>();
 		//initialize a parent hashmap
 		HashMap<Node, ArrayList<Node>> parentMap = new HashMap<>();
+		//initialize a visited set
+		Set<Node>visited = new HashSet<>();
 		queue.add(startNode);
 		while(!queue.isEmpty()) {
 			Node curr = queue.remove();
+			curr.setVisited(true);
+			visited.add(curr);
 			nodeSearched.accept(curr.getLocation());
 			if(curr.equals(goalNode)) {
 
+				for(Node n : findPathFromParentMap(parentMap, goalNode)){ path.add(n.getLocation());}
 				return path;
 			}
 			//for each neigbor of curr, mark them as visited and add them as children of curr
 			//afterwards, add them to the queue to keep this train a-rollin'
 			for (Node neighbor : adjacencyListMap.get(curr)) {
-				if(!neighbor.isVisited()) {
+				if(!visited.contains(neighbor)) {
 					neighbor.setVisited(true);
+					visited.add(neighbor);
 					if(parentMap.containsKey(curr)) {
 						ArrayList<Node> childList = parentMap.get(curr);
 						childList.add(neighbor);
@@ -185,15 +191,31 @@ public class MapGraph {
 			}
 		}
 
-
-
 		// Hook for visualization.  See writeup.
 		//nodeSearched.accept(next.getLocation());
 
 		return path;
 	}
 	
+	private List <Node> findPathFromParentMap(HashMap<Node, ArrayList<Node>> parentMap, Node finish){
+		//get the starting node
+		List<Node> path = new ArrayList<>();
+		for(Node parent: parentMap.keySet()){
+			path.add(parent);
+		}
+		return path;
+	}
 
+	public static String printPath(List<GeographicPoint> path) {
+		StringBuffer sb = new StringBuffer();
+		sb.append("PATH: ");
+		for(GeographicPoint g: path) {
+			sb.append("|");
+			sb.append(g.toString()).append("| -> ");
+		}
+		sb.append("\n");
+		return sb.toString().replace(" -> \n", "\n");
+	}
 	/** Find the path from start to goal using Dijkstra's algorithm
 	 * 
 	 * @param start The starting location
@@ -265,7 +287,12 @@ public class MapGraph {
 		sb.append("MapGraph has " + this.getNumVertices() + " vertices, " + this.getNumEdges() + " edges.\n");
 		sb.append("How many keys: " + this.adjacencyListMap.keySet().size() + "\n");
 		for(Node n : this.adjacencyListMap.keySet()) {
-			sb.append(n.toString() + " ==> " +this.adjacencyListMap.get(n).size() +"\n");
+			StringBuffer printNeighbors = new StringBuffer();
+			for(Node neighbor : this.adjacencyListMap.get(n)){
+				printNeighbors.append(neighbor.toString()).append(" ");
+			}
+			//sb.append(n.toString() + " ==> " +this.adjacencyListMap.get(n).size() +"\n");
+			sb.append(n.toString() + " ==> " +printNeighbors.toString() +"\n");
 		}
 		return sb.toString();
 	}
@@ -293,7 +320,8 @@ public class MapGraph {
 		//System.out.println("SECOND: " + q.remove());
 		// You can use this method for testing.
 
-
+		List<GeographicPoint> path = firstMap.bfs(new GeographicPoint(1.0, 1.0), new GeographicPoint(8.0, -1.0));
+		System.out.println(printPath(path));
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 
 		 * programming assignment.
