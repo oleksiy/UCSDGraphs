@@ -168,7 +168,7 @@ public class MapGraph {
 			nodeSearched.accept(curr.getLocation());
 			if(curr.equals(goalNode)) {
 
-				for(Node n : findPathFromParentMap(parentMap, goalNode)){ path.add(n.getLocation());}
+				for(Node n : findPathFromParentMap(parentMap,startNode, goalNode)){ path.add(n.getLocation());}
 				return path;
 			}
 			//for each neigbor of curr, mark them as visited and add them as children of curr
@@ -197,9 +197,28 @@ public class MapGraph {
 		return path;
 	}
 	
-	private List <Node> findPathFromParentMap(HashMap<Node, ArrayList<Node>> parentMap, Node finish){
+	private List <Node> findPathFromParentMap(HashMap<Node, ArrayList<Node>> parentMap, Node start, Node finish){
+
+
 		//get the starting node
 		List<Node> path = new ArrayList<>();
+
+		path.add(start);
+		Node curr = start;
+		while(curr != finish) {
+			ArrayList<Node> nextSteps = parentMap.get(curr);
+			if(nextSteps.contains(finish)){
+				path.add(finish);
+				return path;
+			} else {
+				for(Node n : nextSteps) {
+					if(parentMap.keySet().contains(n)) {
+						nextSteps.add(n);
+
+					}
+				}
+			}
+		}
 		for(Node parent: parentMap.keySet()){
 			path.add(parent);
 		}
