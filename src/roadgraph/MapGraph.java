@@ -13,6 +13,7 @@ import util.GraphLoader;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -167,8 +168,7 @@ public class MapGraph {
 			visited.add(curr);
 			nodeSearched.accept(curr.getLocation());
 			if(curr.equals(goalNode)) {
-
-				for(Node n : findPathFromParentMap(parentMap,startNode, goalNode)){ path.add(n.getLocation());}
+				path = findPathFromParentMap(parentMap, startNode, goalNode);
 				return path;
 			}
 			//for each neigbor of curr, mark them as visited and add them as children of curr
@@ -196,33 +196,32 @@ public class MapGraph {
 
 		return path;
 	}
-	
-	private List <Node> findPathFromParentMap(HashMap<Node, ArrayList<Node>> parentMap, Node start, Node finish){
 
-
-		//get the starting node
-		List<Node> path = new ArrayList<>();
-
-		path.add(start);
-		Node curr = start;
-		while(curr != finish) {
-			ArrayList<Node> nextSteps = parentMap.get(curr);
-			if(nextSteps.contains(finish)){
-				path.add(finish);
-				return path;
-			} else {
-				for(Node n : nextSteps) {
-					if(parentMap.keySet().contains(n)) {
-						nextSteps.add(n);
-
-					}
+	private List<GeographicPoint> findPathFromParentMap(HashMap<Node,ArrayList<Node>> parentMap, Node startNode, Node goalNode) {
+		Set<Node> keysToDelete = new HashSet<>();
+		List<GeographicPoint> path;
+		for(Node key: parentMap.keySet()) {
+			if(!parentMap.get(key).contains(goalNode)) {
+				List<Node> refinedList = parentMap.get(key).stream().filter(x -> parentMap.keySet().contains(x)).collect(Collectors.toList());
+				if(refinedList.isEmpty()) {
+					keysToDelete.add(key);
 				}
+				parentMap.put(key, (ArrayList<Node>)refinedList);
 			}
 		}
-		for(Node parent: parentMap.keySet()){
-			path.add(parent);
+
+		//Remove dead keys and values
+		for(Node keyToDelete: keysToDelete) {
+			parentMap.remove(keyToDelete);
 		}
+
+		//build a path
+		path = parentMap.keySet().stream().map(k -> k.getLocation()).collect(Collectors.toList());
+		//add final destination
+		path.add(goalNode.getLocation());
+
 		return path;
+
 	}
 
 	public static String printPath(List<GeographicPoint> path) {
@@ -332,15 +331,16 @@ public class MapGraph {
 		set.add(4);
 		set.add(3);
 
-		System.out.println(set.toString());
+		//System.out.println(set.toString());
 
-		Map<Node, ArrayList<Node>> myMap = new HashMap<>();
+		//Map<Node, ArrayList<Node>> myMap = new HashMap<>();
 		//System.out.println("FIRST: " + q.remove());
 		//System.out.println("SECOND: " + q.remove());
 		// You can use this method for testing.
 
-		List<GeographicPoint> path = firstMap.bfs(new GeographicPoint(1.0, 1.0), new GeographicPoint(8.0, -1.0));
-		System.out.println(printPath(path));
+		//List<GeographicPoint> path = firstMap.bfs(new GeographicPoint(1.0, 1.0), new GeographicPoint(8.0, -1.0));
+		//System.out.println(printPath(path));
+
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 
 		 * programming assignment.
