@@ -338,8 +338,8 @@ public class MapGraph {
 		//System.out.println("SECOND: " + q.remove());
 		// You can use this method for testing.
 
-		//List<GeographicPoint> path = firstMap.bfs(new GeographicPoint(1.0, 1.0), new GeographicPoint(8.0, -1.0));
-		//System.out.println(printPath(path));
+		List<GeographicPoint> path = firstMap.bfs(new GeographicPoint(1.0, 1.0), new GeographicPoint(8.0, -1.0));
+		System.out.println(printPath(path));
 
 		/* Here are some test cases you should try before you attempt 
 		 * the Week 3 End of Week Quiz, EVEN IF you score 100% on the 
