@@ -197,9 +197,32 @@ public class MapGraph {
 		return path;
 	}
 
+	private void derivePath(Node start, Node end, HashMap<Node, ArrayList<Node>> parentMap){
+		ArrayList<Node> values = new ArrayList<>();
+		parentMap.values().stream().forEach(list -> values.addAll(list));
+		ArrayList<Node> keys = (ArrayList<Node>) parentMap.keySet().stream().collect(Collectors.toList());
+		Stack<Node> path = new Stack<>();
+		List<Edge> paths = new ArrayList<>();
+		for(Node k: parentMap.keySet()) {
+			for(Node possiblePath: parentMap.get(k)) {
+				paths.add(new Edge(k, possiblePath));
+			}
+		}
+		Edge startingEdge = new Edge();
+		for(Edge e: paths){
+			if(e.getDesitinationNode().equals(end)){
+				startingEdge = e;
+				break;
+			}
+		}
+		System.out.println(startingEdge);
+
+	}
+
 	private List<GeographicPoint> findPathFromParentMap(HashMap<Node,ArrayList<Node>> parentMap, Node startNode, Node goalNode) {
 		Set<Node> keysToDelete = new HashSet<>();
 		List<GeographicPoint> path;
+		derivePath(startNode, goalNode, parentMap);
 		for(Node key: parentMap.keySet()) {
 			if(!parentMap.get(key).contains(goalNode)) {
 				List<Node> refinedList = parentMap.get(key).stream().filter(x -> parentMap.keySet().contains(x)).collect(Collectors.toList());
