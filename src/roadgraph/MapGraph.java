@@ -11,9 +11,16 @@ package roadgraph;
 import geography.GeographicPoint;
 import util.GraphLoader;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -168,7 +175,7 @@ public class MapGraph {
 			visited.add(curr);
 			nodeSearched.accept(curr.getLocation());
 			if(curr.equals(goalNode)) {
-				path = findPathFromParentMap(parentMap, startNode, goalNode);
+				path = derivePath(startNode, goalNode, parentMap);
 				return path;
 			}
 			//for each neigbor of curr, mark them as visited and add them as children of curr
@@ -197,54 +204,26 @@ public class MapGraph {
 		return path;
 	}
 
-	private void derivePath(Node start, Node end, HashMap<Node, ArrayList<Node>> parentMap){
-		ArrayList<Node> values = new ArrayList<>();
-		parentMap.values().stream().forEach(list -> values.addAll(list));
-		ArrayList<Node> keys = (ArrayList<Node>) parentMap.keySet().stream().collect(Collectors.toList());
+	private List<GeographicPoint> derivePath(Node start, Node end, HashMap<Node, ArrayList<Node>> parentMap){
+		Stack<Node> temp = new Stack<>();
 		Stack<Node> path = new Stack<>();
-		List<Edge> paths = new ArrayList<>();
-		for(Node k: parentMap.keySet()) {
-			for(Node possiblePath: parentMap.get(k)) {
-				paths.add(new Edge(k, possiblePath));
+		temp.push(start);
+		Node current = start;
+		while(!current.equals(end)) {
+		    path.push(current);
+			if(parentMap.keySet().contains(current)) {
+				parentMap.get(current).stream().forEach(x -> temp.push(x));
 			}
+			current = temp.pop();
 		}
-		Edge startingEdge = new Edge();
-		for(Edge e: paths){
-			if(e.getDesitinationNode().equals(end)){
-				startingEdge = e;
-				break;
-			}
-		}
-		System.out.println(startingEdge);
-
-	}
-
-	private List<GeographicPoint> findPathFromParentMap(HashMap<Node,ArrayList<Node>> parentMap, Node startNode, Node goalNode) {
-		Set<Node> keysToDelete = new HashSet<>();
-		List<GeographicPoint> path;
-		derivePath(startNode, goalNode, parentMap);
-		for(Node key: parentMap.keySet()) {
-			if(!parentMap.get(key).contains(goalNode)) {
-				List<Node> refinedList = parentMap.get(key).stream().filter(x -> parentMap.keySet().contains(x)).collect(Collectors.toList());
-				if(refinedList.isEmpty()) {
-					keysToDelete.add(key);
-				}
-				parentMap.put(key, (ArrayList<Node>)refinedList);
-			}
-		}
-
-		//Remove dead keys and values
-		for(Node keyToDelete: keysToDelete) {
-			parentMap.remove(keyToDelete);
-		}
-
-		//build a path
-		path = parentMap.keySet().stream().map(k -> k.getLocation()).collect(Collectors.toList());
-		//add final destination
-		path.add(goalNode.getLocation());
-
-		return path;
-
+		path.push(end);
+		List<GeographicPoint> geoPoints = new ArrayList<>();
+		while(!path.empty()) {
+		    GeographicPoint point = path.pop().getLocation();
+		    geoPoints.add(point);
+        }
+        Collections.reverse(geoPoints);
+		return geoPoints;
 	}
 
 	public static String printPath(List<GeographicPoint> path) {
